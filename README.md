@@ -6,7 +6,11 @@ Most brokers let you export your trade history as a CSV file, but every broker n
 ```
 python project.py your_trades.csv
 ```
-Example output for a 12-trade file (last lines):
+To try it straight away, run it on the included sample file:
+```
+python project.py sample_trades.csv
+```
+Output (last lines):
 ```
 2026-07-30  AAPL   sell +150.00
 
@@ -28,7 +32,7 @@ The main program. At the top are two alias dictionaries, `HEADER_ALIASES` and `S
 - `parse_number(text)` removes `$`, commas and spaces and converts the text to a float.
 - `calculate_pnl(side, entry, exit, quantity)` returns the P&L of one trade: `(exit - entry) * quantity` for buys and `(entry - exit) * quantity` for sells.
 - `load_trades(filename)` opens the file, maps its headers to standard names, checks that all six required columns exist, cleans every row and returns a list of trade dictionaries.
-- `summarise(pnls)` takes a list of P&Ls and returns a dictionary of statistics.
+- `summarise(pnls)` takes a list of P&Ls and returns a dictionary of statistics. With no winning (or no losing) trades, the matching average is reported as 0 instead of failing; a file with no trades stops with a message.
 
 ### test_project.py
 Tests for `normalize_header`, `normalize_side`, `parse_number`, `calculate_pnl` and `summarise`, using pytest. Each function is tested on normal inputs, edge cases (extra spaces, mixed case, breakeven trades, no losing trades) and invalid inputs that should raise `ValueError`.
@@ -37,7 +41,7 @@ Tests for `normalize_header`, `normalize_side`, `parse_number`, `calculate_pnl` 
 Lists `pytest`, the only library that needs installing. `csv` and `sys` are part of Python's standard library.
 
 ### Input files
-Sample CSVs are not included in this repository. Any CSV with a date, symbol, side, entry price, exit price and quantity column works, as long as the headers match one of the aliases in `HEADER_ALIASES` (for example `Ticker`, `Direction`, `Entry Price`, `Close`, `Qty`). I tested the program on files imitating different brokers: alternative header names, `B`/`S` sides, extra columns such as fees and notes, dollar signs and thousands separators, timestamps, fractional shares, and a file with an invalid side that should make the program stop.
+`sample_trades.csv` is a 12-trade example in a non-standard broker format: headers such as `Trade Date`, `Ticker`, `Direction` and `Qty`, mixed sides (`Buy`, `Long`, `S`, `BOUGHT`, `SOLD`, `Short`), prices with `$` and thousands separators, and an extra `Fees` column that is ignored. Any CSV with a date, symbol, side, entry price, exit price and quantity column works, as long as the headers match one of the aliases in `HEADER_ALIASES` (for example `Ticker`, `Direction`, `Entry Price`, `Close`, `Qty`). I tested the program on files imitating different brokers: alternative header names, `B`/`S` sides, extra columns such as fees and notes, dollar signs and thousands separators, timestamps, fractional shares, and a file with an invalid side that should make the program stop.
 
 ## Design choices
 **Alias dictionaries instead of one fixed format.** Rather than requiring a specific layout, the program compares each cleaned header and side against a list of known variants. Supporting a new broker usually just means adding a word to a list.

@@ -24,6 +24,8 @@ def main():
         sys.exit("File should be a CSV")
 
     trades = load_trades(sys.argv[1])
+    if not trades:
+        sys.exit("No trades found in file")
 
     pnls = []
     for trade in trades:
@@ -42,7 +44,7 @@ def main():
     print(f"Average loss: {stats['avg_loss']:+.2f}")
 
 def normalize_side(value):
-    """convers side like Long or S to buy or sell and raises ValueError if its unknown"""
+    """Convert a side like Long or S to buy or sell; raise ValueError if it's unknown"""
     value = value.strip().lower()
     for standard, variants in SIDE_ALIASES.items():
         if value in variants:
@@ -110,8 +112,8 @@ def summarise(pnls):
     losses = [p for p in pnls if p < 0]
     breakeven = [p for p in pnls if p == 0]
 
-    win_rate = len(wins) / len(pnls) * 100
-    avg_win = sum(wins) / len(wins)
+    win_rate = len(wins) / len(pnls) * 100 if pnls else 0
+    avg_win = sum(wins) / len(wins) if wins else 0
     avg_loss = sum(losses) / len(losses) if losses else 0
 
     return {
