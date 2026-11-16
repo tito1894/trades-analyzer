@@ -56,3 +56,17 @@ def test_summarise_no_losses():
     stats = summarise([100, 300])
     assert stats["avg_loss"] == 0
     assert stats["win_rate"] == 100
+
+
+def test_summarise_no_wins():
+    stats = summarise([-100, 0, -50])
+    assert stats["avg_win"] == 0
+    assert stats["win_rate"] == 0
+    assert stats["avg_loss"] == -75
+
+
+def test_summarise_empty():
+    stats = summarise([])
+    assert stats["trades"] == 0
+    assert stats["total"] == 0
+    assert stats["win_rate"] == 0
